@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from user_app.models import CustomUser
+from user_app.models import CustomUser,Customer,Project
 import re
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -31,3 +31,25 @@ class SetPasswordSerializer(serializers.Serializer):
         if data['password'] != data['confirm_password']:
             raise serializers.ValidationError('Passwords do not match')
         return data
+        
+class ProjectSerializer(serializers.ModelSerializer):
+    customer_name = serializers.CharField(source='customer.customer_name',read_only=True)
+    
+    class Meta:
+        model = Project
+        fields = [
+            'master_project_id',
+            'child_project_id',
+            'project_name',
+            'project_type',
+            'service_offering',
+            'project_status',
+            'customer',
+            'customer_name',
+        ]
+        
+class CustomerSerializer(serializers.ModelSerializer):
+    projects = serializers.StringRelatedField(many=True, read_only=True)
+    class Meta:
+        model = Customer
+        fields = '__all__'
